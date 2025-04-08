@@ -241,4 +241,9 @@ function animateCube() {
 }
 
 // Start animation
-animateCube(); 
+animateCube();
+
+// Remove theme-related code
+document.addEventListener('DOMContentLoaded', () => {
+    // Remove any theme-related code
+}); 

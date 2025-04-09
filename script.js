@@ -8,38 +8,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Form submission handling
-const contactForm = document.getElementById('contact-form');
-if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Get form data
-        const formData = new FormData(this);
-        const formObject = {};
-        formData.forEach((value, key) => {
-            formObject[key] = value;
-        });
-
-        // Here you would typically send the form data to a server
-        // For now, we'll just log it and show a success message
-        console.log('Form submitted:', formObject);
-        
-        // Show success message
-        const successMessage = document.createElement('div');
-        successMessage.className = 'success-message';
-        successMessage.textContent = 'Thank you for your message! I will get back to you soon.';
-        this.appendChild(successMessage);
-        
-        // Remove success message after 3 seconds
-        setTimeout(() => {
-            successMessage.remove();
-        }, 3000);
-        
-        this.reset();
-    });
-}
-
 // Add scroll effect to navbar
 window.addEventListener('scroll', function() {
     const navbar = document.querySelector('.navbar');

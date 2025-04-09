@@ -128,7 +128,7 @@ let mouseY = 0;
 let cubeRotationX = 0;
 let cubeRotationY = 0;
 let isInteracting = false;
-let spinSpeed = 0.015;
+let spinSpeed = 0.005; // Lowered from 0.015 for smoother performance
 let currentSpinX = 0;
 let currentSpinY = 0;
 let targetRotationX = 0;
@@ -138,18 +138,15 @@ let smoothFactor = 0.1;
 // Mouse move event listener
 document.addEventListener('mousemove', (e) => {
     if (!isInteracting) return;
-    
-    // Calculate mouse position relative to the center of the viewport
+
     mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
     mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
-    
-    // Set target rotation based on mouse position
+
     targetRotationX = mouseY * 2;
     targetRotationY = mouseX * 2;
-    
-    // Add spin effect
-    currentSpinX += spinSpeed;
-    currentSpinY += spinSpeed;
+
+    currentSpinX = spinSpeed;
+    currentSpinY = spinSpeed;
 });
 
 // Mouse enter event
@@ -162,15 +159,13 @@ cubeContainer.addEventListener('mouseenter', () => {
 cubeContainer.addEventListener('mouseleave', () => {
     isInteracting = false;
     cube.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
-    
-    // Reset spin
     currentSpinX = 0;
     currentSpinY = 0;
     targetRotationX = 0;
     targetRotationY = 0;
 });
 
-// Touch events for mobile
+// Touch events
 cubeContainer.addEventListener('touchstart', () => {
     isInteracting = true;
     cube.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -186,32 +181,33 @@ cubeContainer.addEventListener('touchend', () => {
 });
 
 // Animation loop
-function animateCube() {
-    if (isInteracting) {
-        // Smoothly interpolate current rotation to target rotation
-        cubeRotationX += (targetRotationX - cubeRotationX) * smoothFactor;
-        cubeRotationY += (targetRotationY - cubeRotationY) * smoothFactor;
-        
-        // Add continuous spin while interacting
-        cubeRotationX += currentSpinX;
-        cubeRotationY += currentSpinY;
-    } else {
-        // Gradually return to original position
-        cubeRotationX *= 0.95;
-        cubeRotationY *= 0.95;
+function animateCube(timestamp) {
+    const isIdle = !isInteracting && Math.abs(cubeRotationX) < 0.001 && Math.abs(cubeRotationY) < 0.001;
+
+    if (!isIdle) {
+        if (isInteracting) {
+            cubeRotationX += (targetRotationX - cubeRotationX) * smoothFactor;
+            cubeRotationY += (targetRotationY - cubeRotationY) * smoothFactor;
+
+            cubeRotationX += currentSpinX;
+            cubeRotationY += currentSpinY;
+        } else {
+            cubeRotationX *= 0.95;
+            cubeRotationY *= 0.95;
+        }
+
+        cubeRotationX %= (2 * Math.PI);
+        cubeRotationY %= (2 * Math.PI);
+
+        cube.style.transform = `rotateX(${cubeRotationX}rad) rotateY(${cubeRotationY}rad)`;
     }
-    
-    // Apply rotation to cube
-    cube.style.transform = `rotateX(${cubeRotationX}rad) rotateY(${cubeRotationY}rad)`;
-    
-    // Continue animation
+
     requestAnimationFrame(animateCube);
 }
 
-// Start animation
-animateCube();
+requestAnimationFrame(animateCube);
 
-// Remove theme-related code
+// DOM loaded callback (if needed)
 document.addEventListener('DOMContentLoaded', () => {
-    // Remove any theme-related code
-}); 
+    // Clean up theme-related code here if necessary
+});

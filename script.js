@@ -125,28 +125,31 @@ const cubeContainer = document.querySelector('.cube-container');
 
 let mouseX = 0;
 let mouseY = 0;
-let cubeRotationX = 0;
-let cubeRotationY = 0;
+let cubeRotationX = -15; // Initial X rotation
+let cubeRotationY = 15;  // Initial Y rotation
 let isInteracting = false;
-let spinSpeed = 0.005; // Lowered from 0.015 for smoother performance
+let spinSpeed = 0.02;    // Reduced spin speed
 let currentSpinX = 0;
 let currentSpinY = 0;
-let targetRotationX = 0;
-let targetRotationY = 0;
+let targetRotationX = -15; // Initial target X rotation
+let targetRotationY = 15;  // Initial target Y rotation
 let smoothFactor = 0.1;
 
 // Mouse move event listener
 document.addEventListener('mousemove', (e) => {
     if (!isInteracting) return;
-
-    mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
-    mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
-
-    targetRotationX = mouseY * 2;
-    targetRotationY = mouseX * 2;
-
-    currentSpinX = spinSpeed;
-    currentSpinY = spinSpeed;
+    
+    // Calculate mouse position relative to the center of the viewport
+    mouseX = (e.clientX - window.innerWidth / 2) * 0.002; // Increased sensitivity
+    mouseY = (e.clientY - window.innerHeight / 2) * 0.002; // Increased sensitivity
+    
+    // Set target rotation based on mouse position
+    targetRotationX = -15 + mouseY * 2; // Maintain initial tilt
+    targetRotationY = 15 + mouseX * 2;  // Maintain initial tilt
+    
+    // Add spin effect
+    currentSpinX += spinSpeed;
+    currentSpinY += spinSpeed;
 });
 
 // Mouse enter event
@@ -159,13 +162,15 @@ cubeContainer.addEventListener('mouseenter', () => {
 cubeContainer.addEventListener('mouseleave', () => {
     isInteracting = false;
     cube.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
+    
+    // Reset to initial tilt
     currentSpinX = 0;
     currentSpinY = 0;
-    targetRotationX = 0;
-    targetRotationY = 0;
+    targetRotationX = -15;
+    targetRotationY = 15;
 });
 
-// Touch events
+// Touch events for mobile
 cubeContainer.addEventListener('touchstart', () => {
     isInteracting = true;
     cube.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -176,38 +181,37 @@ cubeContainer.addEventListener('touchend', () => {
     cube.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
     currentSpinX = 0;
     currentSpinY = 0;
-    targetRotationX = 0;
-    targetRotationY = 0;
+    targetRotationX = -15;
+    targetRotationY = 15;
 });
 
 // Animation loop
-function animateCube(timestamp) {
-    const isIdle = !isInteracting && Math.abs(cubeRotationX) < 0.001 && Math.abs(cubeRotationY) < 0.001;
-
-    if (!isIdle) {
-        if (isInteracting) {
-            cubeRotationX += (targetRotationX - cubeRotationX) * smoothFactor;
-            cubeRotationY += (targetRotationY - cubeRotationY) * smoothFactor;
-
-            cubeRotationX += currentSpinX;
-            cubeRotationY += currentSpinY;
-        } else {
-            cubeRotationX *= 0.95;
-            cubeRotationY *= 0.95;
-        }
-
-        cubeRotationX %= (2 * Math.PI);
-        cubeRotationY %= (2 * Math.PI);
-
-        cube.style.transform = `rotateX(${cubeRotationX}rad) rotateY(${cubeRotationY}rad)`;
+function animateCube() {
+    if (isInteracting) {
+        // Smoothly interpolate current rotation to target rotation
+        cubeRotationX += (targetRotationX - cubeRotationX) * smoothFactor;
+        cubeRotationY += (targetRotationY - cubeRotationY) * smoothFactor;
+        
+        // Add continuous spin while interacting
+        cubeRotationX += currentSpinX;
+        cubeRotationY += currentSpinY;
+    } else {
+        // Gradually return to initial tilt
+        cubeRotationX += (-15 - cubeRotationX) * 0.05;
+        cubeRotationY += (15 - cubeRotationY) * 0.05;
     }
-
+    
+    // Apply rotation to cube
+    cube.style.transform = `rotateX(${cubeRotationX}deg) rotateY(${cubeRotationY}deg)`;
+    
+    // Continue animation
     requestAnimationFrame(animateCube);
 }
 
-requestAnimationFrame(animateCube);
+// Start animation
+animateCube();
 
-// DOM loaded callback (if needed)
+// Remove theme-related code
 document.addEventListener('DOMContentLoaded', () => {
-    // Clean up theme-related code here if necessary
-});
+    // Remove any theme-related code
+}); 

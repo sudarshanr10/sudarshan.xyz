@@ -125,15 +125,14 @@ const cubeContainer = document.querySelector('.cube-container');
 
 let mouseX = 0;
 let mouseY = 0;
-let cubeRotationX = -15; // Initial X rotation
-let cubeRotationY = 15;  // Initial Y rotation
+let cubeRotationX = 0;
+let cubeRotationY = 0;
 let isInteracting = false;
-let baseSpinSpeed = 0.005;    // Base slow spin speed
-let interactionSpinSpeed = 0.02; // Faster spin speed during interaction
+let spinSpeed = 0.015;
 let currentSpinX = 0;
 let currentSpinY = 0;
-let targetRotationX = -15; // Initial target X rotation
-let targetRotationY = 15;  // Initial target Y rotation
+let targetRotationX = 0;
+let targetRotationY = 0;
 let smoothFactor = 0.1;
 
 // Mouse move event listener
@@ -141,16 +140,16 @@ document.addEventListener('mousemove', (e) => {
     if (!isInteracting) return;
     
     // Calculate mouse position relative to the center of the viewport
-    mouseX = (e.clientX - window.innerWidth / 2) * 0.002;
-    mouseY = (e.clientY - window.innerHeight / 2) * 0.002;
+    mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
+    mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
     
     // Set target rotation based on mouse position
-    targetRotationX = -15 + mouseY * 2;
-    targetRotationY = 15 + mouseX * 2;
+    targetRotationX = mouseY * 2;
+    targetRotationY = mouseX * 2;
     
-    // Add faster spin effect during interaction
-    currentSpinX += interactionSpinSpeed;
-    currentSpinY += interactionSpinSpeed;
+    // Add spin effect
+    currentSpinX += spinSpeed;
+    currentSpinY += spinSpeed;
 });
 
 // Mouse enter event
@@ -164,11 +163,11 @@ cubeContainer.addEventListener('mouseleave', () => {
     isInteracting = false;
     cube.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
     
-    // Reset to initial tilt
+    // Reset spin
     currentSpinX = 0;
     currentSpinY = 0;
-    targetRotationX = -15;
-    targetRotationY = 15;
+    targetRotationX = 0;
+    targetRotationY = 0;
 });
 
 // Touch events for mobile
@@ -182,8 +181,8 @@ cubeContainer.addEventListener('touchend', () => {
     cube.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
     currentSpinX = 0;
     currentSpinY = 0;
-    targetRotationX = -15;
-    targetRotationY = 15;
+    targetRotationX = 0;
+    targetRotationY = 0;
 });
 
 // Animation loop
@@ -197,17 +196,13 @@ function animateCube() {
         cubeRotationX += currentSpinX;
         cubeRotationY += currentSpinY;
     } else {
-        // Gradually return to initial tilt
-        cubeRotationX += (-15 - cubeRotationX) * 0.05;
-        cubeRotationY += (15 - cubeRotationY) * 0.05;
-        
-        // Add constant slow spin
-        cubeRotationX += baseSpinSpeed;
-        cubeRotationY += baseSpinSpeed;
+        // Gradually return to original position
+        cubeRotationX *= 0.95;
+        cubeRotationY *= 0.95;
     }
     
     // Apply rotation to cube
-    cube.style.transform = `rotateX(${cubeRotationX}deg) rotateY(${cubeRotationY}deg)`;
+    cube.style.transform = `rotateX(${cubeRotationX}rad) rotateY(${cubeRotationY}rad)`;
     
     // Continue animation
     requestAnimationFrame(animateCube);

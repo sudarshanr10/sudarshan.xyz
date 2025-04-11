@@ -128,7 +128,8 @@ let mouseY = 0;
 let cubeRotationX = -15; // Initial X rotation
 let cubeRotationY = 15;  // Initial Y rotation
 let isInteracting = false;
-let spinSpeed = 0.02;    // Reduced spin speed
+let baseSpinSpeed = 0.005;    // Base slow spin speed
+let interactionSpinSpeed = 0.02; // Faster spin speed during interaction
 let currentSpinX = 0;
 let currentSpinY = 0;
 let targetRotationX = -15; // Initial target X rotation
@@ -140,16 +141,16 @@ document.addEventListener('mousemove', (e) => {
     if (!isInteracting) return;
     
     // Calculate mouse position relative to the center of the viewport
-    mouseX = (e.clientX - window.innerWidth / 2) * 0.002; // Increased sensitivity
-    mouseY = (e.clientY - window.innerHeight / 2) * 0.002; // Increased sensitivity
+    mouseX = (e.clientX - window.innerWidth / 2) * 0.002;
+    mouseY = (e.clientY - window.innerHeight / 2) * 0.002;
     
     // Set target rotation based on mouse position
-    targetRotationX = -15 + mouseY * 2; // Maintain initial tilt
-    targetRotationY = 15 + mouseX * 2;  // Maintain initial tilt
+    targetRotationX = -15 + mouseY * 2;
+    targetRotationY = 15 + mouseX * 2;
     
-    // Add spin effect
-    currentSpinX += spinSpeed;
-    currentSpinY += spinSpeed;
+    // Add faster spin effect during interaction
+    currentSpinX += interactionSpinSpeed;
+    currentSpinY += interactionSpinSpeed;
 });
 
 // Mouse enter event
@@ -199,6 +200,10 @@ function animateCube() {
         // Gradually return to initial tilt
         cubeRotationX += (-15 - cubeRotationX) * 0.05;
         cubeRotationY += (15 - cubeRotationY) * 0.05;
+        
+        // Add constant slow spin
+        cubeRotationX += baseSpinSpeed;
+        cubeRotationY += baseSpinSpeed;
     }
     
     // Apply rotation to cube
